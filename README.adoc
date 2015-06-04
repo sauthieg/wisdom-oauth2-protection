@@ -19,6 +19,8 @@
 
 == OAuth 2.0 Protection Plugin for Wisdom Framework
 
+image:https://travis-ci.org/sauthieg/wisdom-oauth2-protection.svg["Build Status", link="https://travis-ci.org/sauthieg/wisdom-oauth2-protection"]
+
 Wisdom Framework extension that protects routes against un-authorized access using the https://tools.ietf.org/html/rfc6749[OAuth 2.0 Framework].
 
  * Version: 1.0
