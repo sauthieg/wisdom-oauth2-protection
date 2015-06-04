@@ -32,14 +32,12 @@ public class RequiredScopesInterceptor extends Interceptor<Scopes> {
     }
 
     @Override
-    public Result call(final Scopes scopes, final RequestContext context)
-            throws Exception {
-        logger.info("Invoking " + context.context().request().method() +
-                            " " + context.context().request().uri());
+    public Result call(final Scopes scopes, final RequestContext context) throws Exception {
 
         String accessToken = getAccessToken(context.request());
         if (accessToken == null) {
             // TODO return a more OAuth 2.0 response
+            logger.warn("Missing AccessToken when accessing %s", context.request().uri());
             return Results.badRequest();
         }
 
@@ -47,11 +45,13 @@ public class RequiredScopesInterceptor extends Interceptor<Scopes> {
         if (!tokenInfo.isActive()) {
             // TODO return a more OAuth 2.0 response
             // Probably expired/revoked token
+            logger.warn("Expired/Revoked AccessToken when accessing %s", context.request().uri());
             return Results.forbidden();
         }
 
         if (!tokenInfo.getScopes().containsAll(Arrays.asList(scopes.value()))) {
             // TODO return a more OAuth 2.0 response
+            logger.warn("Missing required scopes when accessing %s", context.request().uri());
             return Results.forbidden();
         }
 
