@@ -37,7 +37,7 @@ import com.forgerock.wisdom.oauth2.info.TokenIntrospectionService;
 /**
  * Created by guillaume on 03/06/15.
  */
-@Component
+@Component(name = "openam")
 @Provides
 public class OpenAmIntrospectionService implements TokenIntrospectionService {
 

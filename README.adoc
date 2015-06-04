@@ -53,6 +53,78 @@ public Result underProtection() {
 If you add more scopes values in the +@Scopes+ annotation, all of the declared scopes will be required to access the action.
 If one is missing, the request will be rejected.
 
+=== Configuration
+
+[[conf]]Your application configuration file needs to include the a config element.
+In here you declare against which OAuth 2.0 provider you want to verify the extracted token.
+
+[source]
+----
+oauth2-protection {
+  // Declaration of the introspection service to use
+  introspection-service {
+    type = fake // <1>
+    // Other properties can be passed here to configure the service instance
+  }
+}
+----
+<1> Mandatory property
+
+=== Pre-defined TokenIntrospectionService types
+
+This extension comes with a number of pre-defined +TokenIntrospectionService+ components.
+
+Theses can be declared for use in the application configuration file (as described in the <<conf>> section)
+
+==== Google
+
+Link against https://developers.google.com/identity/protocols/OAuth2UserAgent#tokeninfo-validation[Google OAuth 2.0] endpoints.
+
+There is no configuration properties available.
+
+[source]
+----
+oauth2-protection {
+  introspection-service {
+    type = google
+  }
+}
+----
+
+==== ForgeRock OpenAM
+
+Link against http://openam.forgerock.org/doc/bootstrap/admin-guide/index.html#chap-oauth2[ForgeRock OpenAM OAuth 2.0 endpoints].
+
+[source]
+----
+oauth2-protection {
+  introspection-service {
+    type = openam
+    baseUrl = http://openam.example.com/openam // <1>
+    realm = /customers // <2>
+  }
+}
+----
+<1> Required
+<2> Optional (defaults to top level realm +/+)
+
+==== Standard
+
+Link against https://tools.ietf.org/html/draft-ietf-oauth-introspection[OAuth 2.0 Introspection Endpoint] providers.
+
+[source]
+----
+oauth2-protection {
+  introspection-service {
+    type = standard
+    baseUrl = http://openam.example.com/openam/oauth2/introspection // <1>
+    bearerToken = f9063e26-3a29-41ec-86de-1d0d68aa85e9 // <2>
+  }
+}
+----
+<1> Required, full URL of the introspection REST endpoint
+<2> Optional, needed if the endpoint is OAuth 2.0 protected
+
 == Disclaimer
 
 This plugin is not supported by ForgeRock AS.

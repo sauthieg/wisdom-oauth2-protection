@@ -35,7 +35,7 @@ import com.forgerock.wisdom.oauth2.info.TokenIntrospectionService;
 /**
  * Created by guillaume on 03/06/15.
  */
-@Component
+@Component(name = "google")
 @Provides
 public class GoogleIntrospectionService implements TokenIntrospectionService {
 
