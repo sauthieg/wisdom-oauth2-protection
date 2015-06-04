@@ -1,0 +1,58 @@
+= Wisdom OAuth 2.0 Protection Plugin
+:toc:
+
+//
+// Copyright 2015 ForgeRock AS.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+== OAuth 2.0 Protection Plugin for Wisdom Framework
+
+Wisdom Framework extension that protects routes against un-authorized access using the https://tools.ietf.org/html/rfc6749[OAuth 2.0 Framework].
+
+ * Version: 1.0
+ * License: Apache Software License 2.0
+ * Authors: Guillaume Sauthier
+
+== Usage
+
+Add this dependency to your wisdom application:
+
+[source, xml]
+----
+<dependency>
+    <groupId>com.forgerock.wisdom.oauth2</groupId>
+    <artifactId>wisdom-oauth2-protection</artifactId>
+    <version>${oauth2-protection.version}</version>
+</dependency>
+----
+
+Then you may add the +@Scopes+ annotation on your routes if you want to protect the decorated route:
+
+[source, java]
+----
+@Scopes("http://wisdom.example.com/#write")
+@Route(method = GET, uri = "/protected")
+public Result underProtection() {
+    // Do your usual logic here
+    return ok();
+}
+----
+
+If you add more scopes values in the +@Scopes+ annotation, all of the declared scopes will be required to access the action.
+If one is missing, the request will be rejected.
+
+== Disclaimer
+
+This plugin is not supported by ForgeRock AS.
