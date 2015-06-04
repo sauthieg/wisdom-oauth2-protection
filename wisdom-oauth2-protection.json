@@ -1,0 +1,26 @@
+{
+  "name": "wisdom-oauth2-protection",
+  "version":"1.0.0",
+  "description": "A Wisdom Framework interceptor that acts as a an OAuth 2.0 Resource Server.It checks if there is a valid OAuth 2.0 token as parameter (access_token) or as Authorization header Bearer token.",
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sauthieg/wisdom-oauth2-protection"
+  },
+
+  "author": "Guillaume Sauthier (ForgeRock)",
+  "license": {
+    "type": "Apache",
+    "url": "https://github.com/sauthieg/wisdom-oauth2-protection/blob/master/LICENSE"
+  },
+  "homepage": "https://github.com/sauthieg/wisdom-oauth2-protection",
+  "keywords": [
+    "oauth2",
+    "security",
+    "token",
+    "tokeninfo",
+    "google",
+    "openam",
+    "introspection"
+  ]
+}
