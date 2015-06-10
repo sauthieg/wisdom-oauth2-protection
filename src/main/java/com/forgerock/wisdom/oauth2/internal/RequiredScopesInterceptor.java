@@ -16,14 +16,24 @@
 
 package com.forgerock.wisdom.oauth2.internal;
 
-import java.util.Arrays;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
+import static org.wisdom.api.http.HeaderNames.AUTHORIZATION;
+import static org.wisdom.api.http.HeaderNames.WWW_AUTHENTICATE;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Instantiate;
+import org.apache.felix.ipojo.annotations.Property;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wisdom.api.configuration.ApplicationConfiguration;
 import org.wisdom.api.http.Request;
 import org.wisdom.api.http.Result;
 import org.wisdom.api.http.Results;
@@ -43,48 +53,81 @@ public class RequiredScopesInterceptor extends Interceptor<Scopes> {
 
     private final TokenIntrospectionService tokenIntrospection;
 
-    public RequiredScopesInterceptor(@Requires final TokenIntrospectionService tokenIntrospection) {
+    private final String realm;
+
+    public RequiredScopesInterceptor(@Requires final TokenIntrospectionService tokenIntrospection,
+                                     @Requires final ApplicationConfiguration applicationConfiguration) {
+        this(tokenIntrospection, applicationConfiguration.getWithDefault("oauth2-protection.realm", "no-name"));
+    }
+
+    public RequiredScopesInterceptor(final TokenIntrospectionService tokenIntrospection,
+                                      final String realm) {
         this.tokenIntrospection = tokenIntrospection;
+        this.realm = realm;
     }
 
     @Override
     public Result call(final Scopes scopes, final RequestContext context) throws Exception {
+        Set<String> tokens = getAccessTokens(context.request());
 
-        String accessToken = getAccessToken(context.request());
-        if (accessToken == null) {
-            // TODO return a more OAuth 2.0 response
-            logger.warn("Missing AccessToken when accessing %s", context.request().uri());
-            return Results.badRequest();
+        // Check for invalid request (multiple tokens defined) or non-oauth2 authentication methods
+        if (tokens == null || tokens.size() > 1) {
+            logger.warn("Invalid request when accessing %s", context.request().uri());
+            return Results.badRequest().with(WWW_AUTHENTICATE,
+                                             clean(format("Bearer realm='%s'", realm)));
         }
 
-        TokenInfo tokenInfo = tokenIntrospection.introspect(accessToken);
+        // There is one or zero token
+        if (tokens.isEmpty()) {
+            logger.warn("Missing AccessToken when accessing %s", context.request().uri());
+            return Results.unauthorized().with(WWW_AUTHENTICATE,
+                                               clean(format("Bearer realm='%s'", realm)));
+        }
+
+        // There is 1 token
+        TokenInfo tokenInfo = tokenIntrospection.introspect(tokens.iterator().next());
         if (!tokenInfo.isActive()) {
-            // TODO return a more OAuth 2.0 response
             // Probably expired/revoked token
             logger.warn("Expired/Revoked AccessToken when accessing %s", context.request().uri());
-            return Results.forbidden();
+            return Results.unauthorized().with(WWW_AUTHENTICATE,
+                                               clean(format("Bearer realm='%s' error='invalid_token'", realm)));
         }
 
-        if (!tokenInfo.getScopes().containsAll(Arrays.asList(scopes.value()))) {
-            // TODO return a more OAuth 2.0 response
+        if (!tokenInfo.getScopes().containsAll(asList(scopes.value()))) {
             logger.warn("Missing required scopes when accessing %s", context.request().uri());
-            return Results.forbidden();
+            return Results.forbidden().with(WWW_AUTHENTICATE,
+                                            clean(format("Bearer realm='%s' error='insufficient_scope' scope='%s'",
+                                                         realm,
+                                                         asList(scopes.value()).stream().collect(joining(" ")))));
         }
 
         return context.proceed();
     }
 
-    private static String getAccessToken(final Request request) {
-        String token = request.parameter("access_token");
-        if (token == null) {
-            String authorization = request.getHeader("Authorization");
-            if (authorization != null) {
-                if (authorization.startsWith("Bearer ")) {
-                    token = authorization.substring("Bearer ".length());
-                }
-            }
+    private static Set<String> getAccessTokens(final Request request) {
+        Set<String> tokens = new HashSet<>();
+
+        // Look in the query parameters
+        List<String> paramTokens = request.parameters().get("access_token");
+        if (paramTokens != null) {
+            tokens.addAll(paramTokens);
         }
-        return token;
+
+        // Look the Authorization header values
+        List<String> authorizations = request.headers().get(AUTHORIZATION);
+        if (authorizations != null) {
+            // return null if there are any non-Bearer token values
+            if (authorizations.stream().anyMatch(value -> !value.startsWith("Bearer "))) {
+                return null;
+            }
+            // Collect all the Bearer tokens
+            authorizations.stream().forEach(value -> tokens.add(value.substring("Bearer ".length())));
+        }
+        return tokens;
+    }
+
+    private static String clean(String value) {
+        return value.replace('\'', '"');
     }
 
     @Override
