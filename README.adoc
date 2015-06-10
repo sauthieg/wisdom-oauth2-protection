@@ -57,7 +57,7 @@ If one is missing, the request will be rejected.
 
 === Configuration
 
-[[conf]]Your application configuration file needs to include the a config element.
+Your application configuration file needs to include the a config element.
 In here you declare against which OAuth 2.0 provider you want to verify the extracted token.
 
 [source]
@@ -76,7 +76,7 @@ oauth2-protection {
 
 This extension comes with a number of pre-defined +TokenIntrospectionService+ components.
 
-Theses can be declared for use in the application configuration file (as described in the <<conf>> section)
+Theses can be declared for use in the application configuration file (as described in the <<Configuration>> section)
 
 ==== Google
 
@@ -95,7 +95,7 @@ oauth2-protection {
 
 ==== ForgeRock OpenAM
 
-Link against http://openam.forgerock.org/doc/bootstrap/admin-guide/index.html#chap-oauth2[ForgeRock OpenAM OAuth 2.0 endpoints].
+Link against http://openam.forgerock.org/doc/bootstrap/admin-guide/index.html#chap-oauth2[ForgeRock OpenAM OAuth 2.0] endpoints.
 
 [source]
 ----
