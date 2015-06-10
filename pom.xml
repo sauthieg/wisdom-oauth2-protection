@@ -60,6 +60,12 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.wisdom-framework</groupId>
+      <artifactId>wisdom-test</artifactId>
+    </dependency>
+
   </dependencies>
 
   <dependencyManagement>
@@ -92,9 +98,29 @@
         <version>0.9.1</version>
         <extensions>true</extensions>
         <configuration>
-          <wisdomRuntime>base</wisdomRuntime>
+          <!--<wisdomRuntime>base</wisdomRuntime>-->
           <disableDistributionPackaging>true</disableDistributionPackaging>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <property>
+                  <name>listener</name>
+                  <value>org.wisdom.test.WisdomRunListener</value>
+                </property>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
