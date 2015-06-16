@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package com.forgerock.wisdom.oauth2;
+package com.forgerock.wisdom.oauth2.it;
 
 import static org.wisdom.api.http.HttpMethod.GET;
 
-import org.apache.felix.ipojo.annotations.Component;
-import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Provides;
-import org.wisdom.api.Controller;
 import org.wisdom.api.DefaultController;
+import org.wisdom.api.annotations.Controller;
 import org.wisdom.api.annotations.Route;
 import org.wisdom.api.http.Result;
 
-/**
- * Created by guillaume on 03/06/15.
- */
-@Component
-@Provides(specifications = Controller.class)
-@Instantiate
+import com.forgerock.wisdom.oauth2.Scopes;
+
+@Controller
 public class ProtectedController extends DefaultController {
     @Scopes("http://wisdom.example.com/#write")
     @Route(method = GET, uri = "/protected")

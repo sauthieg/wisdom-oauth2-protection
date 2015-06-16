@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.forgerock.wisdom.oauth2;
+package com.forgerock.wisdom.oauth2.it;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
-import org.apache.felix.ipojo.annotations.Validate;
 
 import com.forgerock.wisdom.oauth2.info.TokenInfo;
 import com.forgerock.wisdom.oauth2.info.TokenIntrospectionService;
@@ -34,10 +33,6 @@ public class FakeTokenIntrospectionService implements TokenIntrospectionService 
     public static final String TOKEN_INVALID = "23410913-abewfq.123483";
     public static final String TOKEN_MISSING_SCOPES = "1/6BMfW9j53gdGImsiyUH5kU5RsR4zwI9lUVX-tqf8JXQ";
 
-    public FakeTokenIntrospectionService() {
-        System.out.println("Yes");
-    }
-
     @Override
     public TokenInfo introspect(final String token) {
         switch (token) {
@@ -48,10 +43,5 @@ public class FakeTokenIntrospectionService implements TokenIntrospectionService 
         default:
             return new TokenInfo(true, System.currentTimeMillis() + 1000, "http://wisdom.example.com/#write");
         }
-    }
-
-    @Validate
-    public void start() {
-        System.out.println("Yes");
     }
 }
